@@ -48,6 +48,7 @@ def _search_decorator(decorators: list[Decorator]) -> Decorator | None:
 
 
 def _resolve_http_code(func, http_code: str | ExprAttribute):
+    """When http code is an attribute, try to get the value."""
     if isinstance(http_code, ExprAttribute):
         if http_code.canonical_path.startswith("fastapi.status."):
             return http_code.last.name.split("_")[1]
