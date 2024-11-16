@@ -11,3 +11,29 @@ These fields are stored in the extra property of the function. The extra propert
 is the key for the fields of this extension.
 
 Create a custom function template to handle these extra fields in your documentation.
+
+Installation
+------------
+
+````
+pip install griffe-fastapi
+````
+
+or with poetry:
+
+````
+poetry add griffe-fastapi -G docs
+````
+
+MkDocs
+------
+
+````
+plugins:
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          extensions:
+          - griffe_fastapi
+````
