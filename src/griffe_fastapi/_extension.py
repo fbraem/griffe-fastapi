@@ -47,26 +47,24 @@ def _search_decorator(decorators: list[Decorator]) -> Decorator | None:
     return None
 
 
+def _resolve_http_code(func, http_code: str | ExprAttribute):
+    if isinstance(http_code, ExprAttribute):
+        if http_code.canonical_path.startswith("fastapi.status."):
+            return http_code.last.name.split("_")[1]
+        logger.warning(
+            f"Could not resolve http code {http_code.canonical_path} "
+            f"for function {func.canonical_path}"
+        )
+        return
+    return http_code
+
+
 def _process_responses(
     func: Function,
-    http_code_attribute: str | ExprAttribute,
+    http_code: str,
     open_api_response: ExprName | ExprDict,
 ):
     """Process the response code and the response object."""
-    http_code = None
-    # When a constant is used, resolve the value
-    if isinstance(http_code_attribute, ExprAttribute):
-        if http_code_attribute.canonical_path.startswith("fastapi.status."):
-            http_code = http_code_attribute.last.name.split("_")[1]
-        if http_code is None:
-            logger.warning(
-                f"Could not resolve http code {http_code_attribute.canonical_path} "
-                f"for function {func.canonical_path}"
-            )
-            return
-    else:
-        http_code = http_code_attribute
-
     func.extra[self_namespace]["responses"][http_code] = {
         ast.literal_eval(str(key)): ast.literal_eval(str(value))
         for key, value in zip(
@@ -140,7 +138,7 @@ class FastAPIExtension(Extension):
                     resolved_responses = {
                         **resolved_responses,
                         **{
-                            k: v
+                            k: _resolve_http_code(func, v)
                             for k, v in zip(
                                 module_attribute.value.keys,
                                 module_attribute.value.values,
@@ -148,7 +146,8 @@ class FastAPIExtension(Extension):
                         },
                     }
             else:
-                resolved_responses[http_code_variable] = open_api_response_obj
+                http_code = _resolve_http_code(func, http_code_variable)
+                resolved_responses[http_code] = open_api_response_obj
 
         func.extra[self_namespace]["responses"] = {}
         for key, value in resolved_responses.items():
