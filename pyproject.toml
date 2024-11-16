@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "Griffe extension for FastAPI."
 authors = ["fbraem <franky.braem@gmail.com>"]
 readme = "README.md"
+keywords = [
+    "griffe", "griffe-extensions", "fastapi"
+]
 
 [tool.poetry.dependencies]
 python = "^3.12"
