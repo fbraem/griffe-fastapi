@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "griffe-fastapi"
+version = "0.1.0"
+description = "Griffe extension for FastAPI."
+authors = ["fbraem <franky.braem@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+griffe = "^1.5.1"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.3"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.7.4"
+black = "^24.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
