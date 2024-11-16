@@ -25,6 +25,12 @@ or with poetry:
 poetry add griffe-fastapi -G docs
 ````
 
+When you use a group, like above, you also need to install it:
+
+````
+poetry install -G docs
+````
+
 MkDocs
 ------
 
