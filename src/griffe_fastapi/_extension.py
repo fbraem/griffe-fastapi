@@ -5,6 +5,7 @@ from typing import Any
 from griffe import (
     Decorator,
     ExprAttribute,
+    ExprCall,
     ExprDict,
     ExprKeyword,
     ExprName,
@@ -21,24 +22,30 @@ self_namespace = "griffe_fastapi"
 logger = get_logger(__name__)
 
 
-def _search_decorator(decorators: list[Decorator]) -> Decorator | None:
+def _search_decorator(func: Function) -> Decorator | None:
     """Search for a APIRouter decorator."""
     decorators = list(
         filter(
             lambda d: d.value.canonical_name in ("get", "post", "patch", "delete"),
-            decorators,
+            func.decorators,
         )
     )
     if len(decorators) == 0:
         return None
 
     for decorator in decorators:
+        if not isinstance(decorator.value, ExprCall):
+            continue
+
+        if not isinstance(decorator.value.function, ExprAttribute):
+            continue
+
+        if not isinstance(decorator.value.function.first, ExprName):
+            continue
+
         module = decorator.value.function.first.parent
         if decorator.value.function.first.name not in module.members:
-            logger.warning(
-                f"Cannot find {decorator.value.function.first.name} in module {module.name}"
-            )
-            return None
+            continue
 
         type_ = module.members[decorator.value.function.first.name].value.canonical_name
         if type_ == "APIRouter":
@@ -101,7 +108,7 @@ class FastAPIExtension(Extension):
             if not any(func.path.startswith(path) for path in self._paths):
                 return
 
-        decorator = _search_decorator(func.decorators)
+        decorator = _search_decorator(func)
         if decorator is None:
             return
 
