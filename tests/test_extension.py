@@ -12,14 +12,15 @@ def test_extension() -> None:
 
         @router.get("/", responses={200:{"description": "Ok"}}) 
         def get_teams() -> list[str]:
-            '''Get the teams.'''
+            '''Get the teams.
+            '''
             return []
     """
 
     with temporary_visited_package(
         "package",
         modules={"__init__.py": code},
-        extensions=Extensions(FastAPIExtension()),
+        extensions=Extensions(FastAPIExtension(generate_table=False)),
     ) as package:
         assert package
         assert package.functions["get_teams"]
@@ -45,7 +46,7 @@ def test_extension_with_constant() -> None:
     with temporary_visited_package(
         "package",
         modules={"__init__.py": code},
-        extensions=Extensions(FastAPIExtension()),
+        extensions=Extensions(FastAPIExtension(generate_table=False)),
     ) as package:
         assert package
         assert package.functions["get_teams"]
@@ -74,7 +75,7 @@ def test_extension_with_multiple_responses() -> None:
     with temporary_visited_package(
         "package",
         modules={"__init__.py": code},
-        extensions=Extensions(FastAPIExtension()),
+        extensions=Extensions(FastAPIExtension(generate_table=False)),
     ) as package:
         assert package
         assert package.functions["get_teams"]
@@ -104,7 +105,7 @@ def test_extension_with_a_response_with_headers() -> None:
     with temporary_visited_package(
         "package",
         modules={"__init__.py": code},
-        extensions=Extensions(FastAPIExtension()),
+        extensions=Extensions(FastAPIExtension(generate_table=False)),
     ) as package:
         assert package
         assert package.functions["get_image"]
@@ -137,7 +138,7 @@ def test_extension_with_a_dict() -> None:
     with temporary_visited_package(
         "package",
         modules={"__init__.py": code},
-        extensions=Extensions(FastAPIExtension()),
+        extensions=Extensions(FastAPIExtension(generate_table=False)),
     ) as package:
         assert package
         assert package.functions["get_teams"]
@@ -168,7 +169,7 @@ def test_extension_mixed() -> None:
     with temporary_visited_package(
         "package",
         modules={"__init__.py": code},
-        extensions=Extensions(FastAPIExtension()),
+        extensions=Extensions(FastAPIExtension(generate_table=False)),
     ) as package:
         assert package
         assert package.functions["get_teams"]
@@ -195,8 +196,41 @@ def test_with_paths() -> None:
     with temporary_visited_package(
         "package",
         modules={"__init__.py": code},
-        extensions=Extensions(FastAPIExtension(paths=["package"])),
+        extensions=Extensions(
+            FastAPIExtension(paths=["package"], generate_table=False)
+        ),
     ) as package:
         assert package
         assert package.functions["get_teams"]
         assert package.functions["get_teams"].extra["griffe_fastapi"] is not None
+
+
+def test_extension_with_table() -> None:
+    code = """
+        from fastapi import ApiRouter
+
+        router = APIRouter()
+
+        @router.get("/", responses={200:{"description": "Ok"}}) 
+        def get_teams() -> list[str]:
+            '''Get the teams.
+            '''
+            return []
+    """
+
+    with temporary_visited_package(
+        "package",
+        modules={"__init__.py": code},
+        extensions=Extensions(FastAPIExtension()),
+    ) as package:
+        assert package
+        assert package.functions["get_teams"]
+        assert package.functions["get_teams"].extra is not None
+        assert "griffe_fastapi" in package.functions["get_teams"].extra
+        extra = package.functions["get_teams"].extra["griffe_fastapi"]
+        assert extra["method"] == "get"
+        assert extra["responses"]["200"]["description"] == "Ok"
+        assert (
+            package.functions["get_teams"].docstring.parsed[1].value
+            == "This api can return the following HTTP codes:\n\n['| Status | Description |', '|--------|-------------|', '| 200 | Ok |']"
+        )

@@ -4,6 +4,8 @@ import ast
 from typing import Any
 from griffe import (
     Decorator,
+    Docstring,
+    DocstringSectionText,
     ExprAttribute,
     ExprCall,
     ExprDict,
@@ -84,14 +86,16 @@ def _process_responses(
 
 
 class FastAPIExtension(Extension):
-    def __init__(self, *, paths: list[str] | None = None):
+    def __init__(self, *, paths: list[str] | None = None, generate_table: bool = True):
         """Initialize the extension.
 
-        When paths are set, the extension will only process the modules of the given
-        path.
+        Args:
+            paths: A list of paths to select api functions
+            generate_table: Generate the table at the end of the function docstring?
         """
         super().__init__()
         self._paths = paths or []
+        self._generate_table = generate_table
 
     def on_function_instance(
         self,
@@ -160,3 +164,20 @@ class FastAPIExtension(Extension):
         func.extra[self_namespace]["responses"] = {}
         for key, value in resolved_responses.items():
             _process_responses(func, key, value)
+
+        if self._generate_table:
+            table = [
+                "| Status | Description |",
+                "|--------|-------------|",
+            ]
+            for http_code, response in func.extra[self_namespace]["responses"].items():
+                table.append(f"| {http_code} | {response['description']} |")
+            if not func.docstring:
+                func.docstring = Docstring("", parent=func)
+            sections = func.docstring.parsed
+            sections.append(
+                DocstringSectionText(
+                    f"This api can return the following HTTP codes:\n\n{table}",
+                    title="HTTP Responses",
+                )
+            )
