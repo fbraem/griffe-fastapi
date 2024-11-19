@@ -175,9 +175,10 @@ class FastAPIExtension(Extension):
             if not func.docstring:
                 func.docstring = Docstring("", parent=func)
             sections = func.docstring.parsed
+            table_str = "\n".join(table)
             sections.append(
                 DocstringSectionText(
-                    f"This api can return the following HTTP codes:\n\n{table}",
+                    f"This api can return the following HTTP codes:\n\n{table_str}",
                     title="HTTP Responses",
                 )
             )

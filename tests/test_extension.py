@@ -232,5 +232,5 @@ def test_extension_with_table() -> None:
         assert extra["responses"]["200"]["description"] == "Ok"
         assert (
             package.functions["get_teams"].docstring.parsed[1].value
-            == "This api can return the following HTTP codes:\n\n['| Status | Description |', '|--------|-------------|', '| 200 | Ok |']"
+            == "This api can return the following HTTP codes:\n\n| Status | Description |\n|--------|-------------|\n| 200 | Ok |"
         )
