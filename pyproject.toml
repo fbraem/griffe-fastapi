@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "griffe-fastapi"
-version = "0.1.4"
+version = "0.1.5"
 description = "Griffe extension for FastAPI."
 authors = ["fbraem <franky.braem@gmail.com>"]
 readme = "README.md"
@@ -25,5 +25,5 @@ black = "^24.10.0"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[project.entry-points."mkdocstrings.python.templates"]
+[tool.poetry.plugins."mkdocstrings.python.templates"]
 griffe-fastapi = "griffe_fastapi:get_templates_path"
