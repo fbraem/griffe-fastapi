@@ -21,8 +21,7 @@ Context:
 {#- Language module providing the `t` translation method. -#}
 
 <div class="doc doc-object doc-function">
-  {% with obj = function, html_id = function.extra.griffe_fastapi.api %}
-
+  {% with obj = function, html_id = function.extra.griffe_fastapi.method + '_' + function.extra.griffe_fastapi.api %}
     {% set function_name = function.extra.griffe_fastapi.api %}
 
     {% filter heading(
@@ -30,8 +29,10 @@ Context:
         role="api",
         id=html_id,
         class="doc doc-heading",
-        toc_label=(('<code class="doc-symbol doc-symbol-toc doc-symbol-' + symbol_type + '"></code>&nbsp;')|safe if config.show_symbol_type_toc else '') + function.name,
+        toc_label=function_name + '&nbsp;&nbsp;(' + function.extra.griffe_fastapi.method + ')',
       ) %}
+        <span class="doc doc-object-name doc-function-name">{{ function_name }}</span>
+        <span class="badge badge-{{ function.extra.griffe_fastapi.method }}">{{ function.extra.griffe_fastapi.method }}</span>
     {% endfilter %}
 
     <div class="doc doc-contents">
