@@ -1,7 +1,7 @@
 """griffe_fastapi extension."""
 
 import ast
-from typing import Any
+from typing import Any, cast
 from griffe import (
     Decorator,
     Docstring,
@@ -116,13 +116,21 @@ class FastAPIExtension(Extension):
         if decorator is None:
             return
 
+        decorator_expr: ExprCall = cast(ExprCall, decorator.value)
+
         func.extra[self_namespace] = {"method": decorator.value.canonical_name}
+        func.extra["mkdocstrings"]["template"] = "fastapi.html.jinja"
+
+        if len(decorator_expr.arguments) > 0:
+            func.extra[self_namespace]["api"] = ast.literal_eval(
+                decorator_expr.arguments[0]
+            )
 
         # Search the "responses" keyword in the arguments of the function.
         responses = next(
             (
                 x
-                for x in decorator.value.arguments
+                for x in decorator_expr
                 if isinstance(x, ExprKeyword) and x.name == "responses"
             ),
             None,

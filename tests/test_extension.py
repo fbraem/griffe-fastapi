@@ -10,7 +10,7 @@ def test_extension() -> None:
 
         router = APIRouter()
 
-        @router.get("/", responses={200:{"description": "Ok"}}) 
+        @router.get("/teams", responses={200:{"description": "Ok"}}) 
         def get_teams() -> list[str]:
             '''Get the teams.
             '''
@@ -28,6 +28,7 @@ def test_extension() -> None:
         assert "griffe_fastapi" in package.functions["get_teams"].extra
         extra = package.functions["get_teams"].extra["griffe_fastapi"]
         assert extra["method"] == "get"
+        assert extra["api"] == "/teams"
         assert extra["responses"]["200"]["description"] == "Ok"
 
 
@@ -37,7 +38,7 @@ def test_extension_with_constant() -> None:
 
         router = APIRouter()
 
-        @router.get("/", responses={status.HTTP_200_OK:{"description": "Ok"}}) 
+        @router.get("/teams", responses={status.HTTP_200_OK:{"description": "Ok"}}) 
         def get_teams() -> list[str]:
             '''Get the teams.'''
             return []
@@ -63,7 +64,7 @@ def test_extension_with_multiple_responses() -> None:
 
         router = APIRouter()
 
-        @router.get("/", responses={
+        @router.get("/teams", responses={
             200:{"description": "Ok"},
             404:{"description": "Not found"}
         }) 
@@ -93,7 +94,7 @@ def test_extension_with_a_response_with_headers() -> None:
 
         router = APIRouter()
 
-        @router.get("/", responses={
+        @router.get("/teams", responses={
             200:{"description": "Ok", "content": {"image/png": {}}},
             404:{"description": "Not found"}
         }) 
@@ -129,7 +130,7 @@ def test_extension_with_a_dict() -> None:
             404: {"description": "Not Found"},
         }
 
-        @router.get("/", responses={**responses}) 
+        @router.get("/teams", responses={**responses}) 
         def get_teams() -> list[str]:
             '''Get the teams.'''
             return []
@@ -160,7 +161,7 @@ def test_extension_mixed() -> None:
             200: {"description": "Ok"}
         }
 
-        @router.get("/", responses={404: {"description": "Not Found"}, **responses}) 
+        @router.get("/teams", responses={404: {"description": "Not Found"}, **responses}) 
         def get_teams() -> list[str]:
             '''Get the teams.'''
             return []
@@ -187,7 +188,7 @@ def test_with_paths() -> None:
 
         router = APIRouter()
 
-        @router.get("/", responses={200:{"description": "Ok"}}) 
+        @router.get("/teams", responses={200:{"description": "Ok"}}) 
         def get_teams() -> list[str]:
             '''Get the teams.'''
             return []
@@ -211,7 +212,7 @@ def test_extension_with_table() -> None:
 
         router = APIRouter()
 
-        @router.get("/", responses={200:{"description": "Ok"}}) 
+        @router.get("/teams", responses={200:{"description": "Ok"}}) 
         def get_teams() -> list[str]:
             '''Get the teams.
             '''
