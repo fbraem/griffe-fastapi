@@ -44,3 +44,9 @@ plugins:
           extensions:
           - griffe_fastapi
 ````
+
+Configuration
+-------------
+
++ **paths** select only apply griffe-fastapi for the given paths
++ **generate_table** Add a table in the docstring with the http response codes (default=True)
