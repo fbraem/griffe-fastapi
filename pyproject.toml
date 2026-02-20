@@ -10,7 +10,7 @@ keywords = [
 
 [tool.poetry.dependencies]
 python = "^3.12"
-griffe = "^1.5.1"
+griffelib = ">=2"
 
 
 [tool.poetry.group.test.dependencies]
